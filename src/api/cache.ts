@@ -24,42 +24,42 @@ const isCacheClientSet = (): boolean => {
 
 const execAsync = async (query: string): Promise<void> => {
     if (!isCacheClientSet()) {
-        throw new Error("UserManagement cache not initialized. Call initializeUserManagementCache first.");
+        throw new Error("Lexi cache not initialized. Call initializeCache first.");
     }
     return await cacheClient?.execAsync(query);
 };
 
 const runAsync = async (query: string, params?: any[]): Promise<SQLiteRunResult> => {
     if (!isCacheClientSet()) {
-        throw new Error("UserManagement cache not initialized. Call initializeUserManagementCache first.");
+        throw new Error("Lexi cache not initialized. Call initializeCache first.");
     }
     return await cacheClient?.runAsync(query, params) as SQLiteRunResult;
 };
 
 const getAllAsync = async <T>(query: string, params?: any[]): Promise<T[]> => {
     if (!isCacheClientSet()) {
-        throw new Error("UserManagement cache not initialized. Call initializeUserManagementCache first.");
+        throw new Error("Lexi cache not initialized. Call initializeCache first.");
     }
     return await cacheClient?.getAllAsync<T>(query, params) as T[];
 };
 
 const beginTransaction = async (): Promise<void> => {
     if (!isCacheClientSet()) {
-        throw new Error("UserManagement cache not initialized. Call initializeUserManagementCache first.");
+        throw new Error("Lexi cache not initialized. Call initializeCache first.");
     }
     return await cacheClient?.beginTransaction();
 };
 
 const commitTransaction = async (): Promise<void> => {
     if (!isCacheClientSet()) {
-        throw new Error("UserManagement cache not initialized. Call initializeUserManagementCache first.");
+        throw new Error("Lexi cache not initialized. Call initializeCache first.");
     }
     return await cacheClient?.commitTransaction();
 };
 
 const rollbackTransaction = async (): Promise<void> => {
     if (!isCacheClientSet()) {
-        throw new Error("UserManagement cache not initialized. Call initializeUserManagementCache first.");
+        throw new Error("Lexi cache not initialized. Call initializeCache first.");
     }
     return await cacheClient?.rollbackTransaction();
 };
