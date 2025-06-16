@@ -27,7 +27,7 @@ const CREATE_MESSAGES_TABLE_QUERY =
         content        TEXT NOT NULL,
         is_read        BOOLEAN NOT NULL DEFAULT FALSE,
         created_at     INTEGER NOT NULL,
-        FOREIGN KEY (chat_id) REFERENCES chats (id) ON DELETE CASCADE
+        FOREIGN KEY (chat_id) REFERENCES chats (chat_id) ON DELETE CASCADE
     );`;
   
 const CREATE_MESSAGES_INDEXES_QUERY = 
