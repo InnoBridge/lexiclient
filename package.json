@@ -1,6 +1,6 @@
 {
   "name": "@innobridge/lexiclient",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Client side(React Native) code to @innobridge/lexi",
   "author": "yilengyao <innobridgetechnology@gmail.com>",
   "repository": {
