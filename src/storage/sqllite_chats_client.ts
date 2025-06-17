@@ -4,9 +4,13 @@ import { SqlLiteClient } from "@/storage/database_client";
 import { Chat, Message } from "@/models/chats";
 import {
     CREATE_CHATS_TABLE_QUERY,
-    CREATE_CHATS_INDEXES_QUERY,
+    CREATE_CHATS_CONNECTION_INDEX_QUERY,
+    CREATE_CHATS_USERS_INDEX_QUERY,
+    CREATE_CHATS_UPDATED_INDEX_QUERY,
     CREATE_MESSAGES_TABLE_QUERY,
-    CREATE_MESSAGES_INDEXES_QUERY,
+    CREATE_MESSAGES_CHAT_INDEX_QUERY,
+    CREATE_MESSAGES_SENDER_INDEX_QUERY,
+    CREATE_MESSAGES_CREATED_INDEX_QUERY,
     GET_CHAT_BY_CONNECTION_ID_QUERY,
     GET_CHAT_BY_CHAT_ID_QUERY,
     GET_CHATS_BY_USER_ID_QUERY,
@@ -31,8 +35,12 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
             await this.createMessagesTable();
 
             // Create indexes and constraints
-            await this.execAsync(CREATE_CHATS_INDEXES_QUERY);
-            await this.execAsync(CREATE_MESSAGES_INDEXES_QUERY);
+            await this.execAsync(CREATE_CHATS_CONNECTION_INDEX_QUERY);
+            await this.execAsync(CREATE_CHATS_USERS_INDEX_QUERY);
+            await this.execAsync(CREATE_CHATS_UPDATED_INDEX_QUERY);
+            await this.execAsync(CREATE_MESSAGES_CHAT_INDEX_QUERY);
+            await this.execAsync(CREATE_MESSAGES_SENDER_INDEX_QUERY);
+            await this.execAsync(CREATE_MESSAGES_CREATED_INDEX_QUERY);
         });
     }
 
