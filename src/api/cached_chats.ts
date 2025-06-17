@@ -36,7 +36,7 @@ const deleteChat = async (chatId: string): Promise<void> => {
     return await cacheClient.deleteChat(chatId);
 };
 
-const deleteChatByConnectionId = async (connectionId: string): Promise<void> => {
+const deleteChatByConnectionId = async (connectionId: number): Promise<void> => {
     if (!cacheClient) {
         throw new Error("Cache client not initialized. Call initializeCache first.");
     }

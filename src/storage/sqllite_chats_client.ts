@@ -98,7 +98,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
         }
     }
 
-    async deleteChatByConnectionId(connectionId: string): Promise<void> {
+    async deleteChatByConnectionId(connectionId: number): Promise<void> {
         try {
             await this.runAsync(DELETE_CHAT_BY_CONNECTION_ID_QUERY, [connectionId]);
         } catch (error) {
