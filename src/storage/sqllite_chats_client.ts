@@ -52,7 +52,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
         return await this.execAsync(CREATE_MESSAGES_TABLE_QUERY);
     }
 
-    async getChatByConnectionId(connectionId: string): Promise<Chat | null> {
+    async getChatByConnectionId(connectionId: number): Promise<Chat | null> {
         const result = await this.getFirstAsync(GET_CHAT_BY_CONNECTION_ID_QUERY, [connectionId]);
         return result ? mapToChat(result) : null;
     }
@@ -128,7 +128,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
         return result.map(mapToMessage);
     }
 
-    async getMessagesByConnectionId(connectionId: string, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
+    async getMessagesByConnectionId(connectionId: number, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
         const query = GET_MESSAGES_BY_CONNECTION_ID_QUERY(createdAfter, limit, offset, desc);
         const result = await this.getAllAsync(query, [connectionId]);
         return result.map(mapToMessage);

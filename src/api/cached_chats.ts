@@ -1,7 +1,7 @@
 import { cacheClient } from "@/api/cache";
 import { Chat, Message } from "@/models/chats";
 
-const getChatByConnectionId = async (connectionId: string): Promise<Chat | null> => {
+const getChatByConnectionId = async (connectionId: number): Promise<Chat | null> => {
     if (!cacheClient) {
         throw new Error("Cache client not initialized. Call initializeCache first.");
     }
@@ -64,7 +64,7 @@ const getMessagesByUserId = async (userId: string, createdAfter?: number, limit?
     return await cacheClient.getMessagesByUserId(userId, createdAfter, limit, offset, desc);
 };
 
-const getMessagesByConnectionId = async (connectionId: string, createdAfter?: number, limit?: number, offset?: number, desc: boolean = true): Promise<Message[]> => {
+const getMessagesByConnectionId = async (connectionId: number, createdAfter?: number, limit?: number, offset?: number, desc: boolean = true): Promise<Message[]> => {
     if (!cacheClient) {
         throw new Error("Cache client not initialized. Call initializeCache first.");
     }
