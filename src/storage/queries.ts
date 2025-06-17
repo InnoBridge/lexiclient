@@ -10,14 +10,18 @@ const CREATE_CHATS_TABLE_QUERY =
         connection_id  INTEGER NOT NULL,
         user_id1       TEXT NOT NULL,
         user_id2       TEXT NOT NULL,
-        created_at     INTEGER NOT NULL DEFAULT NOW(),
+        created_at     INTEGER NOT NULL,
         updated_at     INTEGER DEFAULT NULL
     );`;
 
-const CREATE_CHATS_INDEXES_QUERY = 
-    `CREATE INDEX IF NOT EXISTS idx_chats_connection ON chats(connection_id);
-    CREATE INDEX IF NOT EXISTS idx_chats_users ON chats(user_id1, user_id2);
-    CREATE INDEX IF NOT EXISTS idx_chats_updated ON chats(updated_at DESC);`;
+const CREATE_CHATS_CONNECTION_INDEX_QUERY = 
+    `CREATE INDEX IF NOT EXISTS idx_chats_connection ON chats(connection_id);`;
+
+const CREATE_CHATS_USERS_INDEX_QUERY = 
+    `CREATE INDEX IF NOT EXISTS idx_chats_users ON chats(user_id1, user_id2);`;
+
+const CREATE_CHATS_UPDATED_INDEX_QUERY = 
+    `CREATE INDEX IF NOT EXISTS idx_chats_updated ON chats(updated_at);`;
 
 const CREATE_MESSAGES_TABLE_QUERY =
     ` CREATE TABLE IF NOT EXISTS messages (
@@ -25,15 +29,20 @@ const CREATE_MESSAGES_TABLE_QUERY =
         chat_id        TEXT NOT NULL,
         sender_id      TEXT NOT NULL,
         content        TEXT NOT NULL,
-        is_read        BOOLEAN NOT NULL DEFAULT FALSE,
+        is_read        BOOLEAN NOT NULL DEFAULT 0,
         created_at     INTEGER NOT NULL,
         FOREIGN KEY (chat_id) REFERENCES chats (chat_id) ON DELETE CASCADE
     );`;
   
-const CREATE_MESSAGES_INDEXES_QUERY = 
-    `CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_id, created_at);
-    CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
-    CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at DESC);`;
+const CREATE_MESSAGES_CHAT_INDEX_QUERY = 
+    `CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_id, created_at);`;
+
+const CREATE_MESSAGES_SENDER_INDEX_QUERY = 
+    `CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);`;
+
+const CREATE_MESSAGES_CREATED_INDEX_QUERY = 
+    `CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at);`;
+
 
 const GET_CHAT_BY_CONNECTION_ID_QUERY = 
     `SELECT * FROM chats 
@@ -124,9 +133,13 @@ const UPSERT_MESSAGES_QUERY = (messageCount: number): string => {
 export {
     Transaction,
     CREATE_CHATS_TABLE_QUERY,
-    CREATE_CHATS_INDEXES_QUERY,
+    CREATE_CHATS_CONNECTION_INDEX_QUERY,
+    CREATE_CHATS_USERS_INDEX_QUERY,
+    CREATE_CHATS_UPDATED_INDEX_QUERY,
     CREATE_MESSAGES_TABLE_QUERY,
-    CREATE_MESSAGES_INDEXES_QUERY,
+    CREATE_MESSAGES_CHAT_INDEX_QUERY,
+    CREATE_MESSAGES_SENDER_INDEX_QUERY,
+    CREATE_MESSAGES_CREATED_INDEX_QUERY,
     GET_CHAT_BY_CONNECTION_ID_QUERY,
     GET_CHAT_BY_CHAT_ID_QUERY,
     GET_CHATS_BY_USER_ID_QUERY,
