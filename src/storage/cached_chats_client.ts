@@ -7,7 +7,7 @@ interface CachedChatsClient extends CachedBaseClient {
     getChatsByUserId(userId: string, updatedAfter?: number, desc?: boolean): Promise<Chat[]>;
     upsertChats(chats: Chat[]): Promise<void>;
     deleteChat(chatId: string): Promise<void>;
-    deleteChatByConnectionId(connectionId: string): Promise<void>;
+    deleteChatByConnectionId(connectionId: number): Promise<void>;
     deleteAllChats(): Promise<void>;
     getMessagesByChatId(chatId: string, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]>;
     getMessagesByUserId(userId: string, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]>;
