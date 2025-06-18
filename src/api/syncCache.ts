@@ -112,10 +112,14 @@ const syncChatsAndMessages = async (userId: string, jwt?: string) => {
         for (const [chatId, chat] of Array.from(pulledChatsMap)) {
             const cachedChat = cachedChatsMap.get(chatId);
             if (cachedChat) {
-                if (cachedChat.updatedAt! >= chat.updatedAt!) {
+                if (cachedChat.updatedAt && cachedChat.updatedAt >= chat.updatedAt!) {
                     continue;
                 }
-                const messages = await fetchAllMessages(chat.chatId, cachedChat.updatedAt);
+                // Only pass updatedAt if it's not null/undefined
+                const messages = await fetchAllMessages(
+                    chat.chatId, 
+                    cachedChat.updatedAt || undefined
+                );
                 await upsertMessages(messages.map(msg => ({
                     ...msg,
                     isRead: false
