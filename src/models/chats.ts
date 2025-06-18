@@ -1,6 +1,6 @@
 interface Chat {
   chatId: string;
-  connectionId: string;
+  connectionId: number;
   userId1: string;
   userId2: string;
   createdAt: number;

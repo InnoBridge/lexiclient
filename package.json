@@ -1,6 +1,6 @@
 {
   "name": "@innobridge/lexiclient",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Client side(React Native) code to @innobridge/lexi",
   "author": "yilengyao <innobridgetechnology@gmail.com>",
   "repository": {
@@ -54,6 +54,6 @@
     "node": "^20.0.0 || >=22.0.0"
   },
   "dependencies": {
-    "@innobridge/trpcmessengerclient": "^0.3.0"
+    "@innobridge/trpcmessengerclient": "^0.3.3"
   }
 }
