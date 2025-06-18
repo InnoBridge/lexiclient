@@ -131,7 +131,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
     async getUnreadMessagesCountByConnectionId(connectionId: number): Promise<number> {
         const result = await this.getFirstAsync(GET_UNREAD_MESSAGES_COUNT_BY_CONNECTION_ID_QUERY, [connectionId]);
         return result ? (result as { unread_count: number }).unread_count : 0;
-    };
+    }
 
     async getMessagesByChatId(chatId: string, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
         try {
@@ -143,7 +143,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
                 return [];
             }
             const messageIds = result.map((row: any) => row.message_id);
-            this.updateMessagesAsReadByMessageIds(messageIds);
+            await this.updateMessagesAsReadByMessageIds(messageIds);
             await this.commitTransaction();
             return result.map(mapToMessage);
         } catch (error) {
@@ -169,7 +169,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
                 return [];
             }
             const messageIds = result.map((row: any) => row.message_id);
-            this.updateMessagesAsReadByMessageIds(messageIds);
+            await this.updateMessagesAsReadByMessageIds(messageIds);
             await this.commitTransaction();
             return result.map(mapToMessage);
         } catch (error) {
