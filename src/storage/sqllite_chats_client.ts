@@ -11,6 +11,7 @@ import {
     CREATE_MESSAGES_CHAT_INDEX_QUERY,
     CREATE_MESSAGES_SENDER_INDEX_QUERY,
     CREATE_MESSAGES_CREATED_INDEX_QUERY,
+    ENABLE_FOREIGN_KEYS_QUERY,
     GET_CHAT_BY_CONNECTION_ID_QUERY,
     GET_CHAT_BY_CHAT_ID_QUERY,
     GET_CHATS_BY_USER_ID_QUERY,
@@ -29,6 +30,8 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
         super(db);
 
         this.registerMigration(0, async () => {
+            await this.enableForeignKeys();
+
             // Create chats table
             await this.createChatsTable();
             // Create messages table
@@ -62,6 +65,10 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
         return result ? mapToChat(result) : null;
     }
 
+    private async enableForeignKeys(): Promise<void> {
+        await this.execAsync(ENABLE_FOREIGN_KEYS_QUERY);
+    }
+
     async getChatsByUserId(userId: string, updatedAfter?: number, desc: boolean = true): Promise<Chat[]> {
         const query = GET_CHATS_BY_USER_ID_QUERY(updatedAfter, desc);
         const result = await this.getAllAsync(query, [userId, userId]);
@@ -91,6 +98,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
 
     async deleteChat(chatId: string): Promise<void> {
         try {
+            await this.enableForeignKeys();
             await this.runAsync(DELETE_CHAT_QUERY, [chatId]);
         } catch (error) {
             console.error("Error deleting chat:", error);
@@ -100,6 +108,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
 
     async deleteChatByConnectionId(connectionId: number): Promise<void> {
         try {
+            await this.enableForeignKeys();
             await this.runAsync(DELETE_CHAT_BY_CONNECTION_ID_QUERY, [connectionId]);
         } catch (error) {
             console.error("Error deleting chat by connection ID:", error);
@@ -109,6 +118,7 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
 
     async deleteAllChats(): Promise<void> {
         try {
+            await this.enableForeignKeys();
             await this.runAsync(DELETE_ALL_CHATS_QUERY);
         } catch (error) {
             console.error("Error deleting all chats:", error);
