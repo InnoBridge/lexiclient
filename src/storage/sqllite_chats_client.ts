@@ -135,7 +135,6 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
 
     async getMessagesByChatId(chatId: string, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
         try {
-            await this.beginTransaction();
             const query = GET_MESSAGES_BY_CHAT_ID_QUERY(createdAfter, limit, offset, desc);
             const result = await this.getAllAsync(query, [chatId]);
             if (!result) {
@@ -144,10 +143,8 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
             }
             const messageIds = result.map((row: any) => row.message_id);
             await this.updateMessagesAsReadByMessageIds(messageIds);
-            await this.commitTransaction();
             return result.map(mapToMessage);
         } catch (error) {
-            await this.rollbackTransaction();
             console.error("Error getting messages by chat ID:", error);
             throw error;
         }
@@ -161,19 +158,15 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
 
     async getMessagesByConnectionId(connectionId: number, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
         try {
-            await this.beginTransaction();
             const query = GET_MESSAGES_BY_CONNECTION_ID_QUERY(createdAfter, limit, offset, desc);
             const result = await this.getAllAsync(query, [connectionId]);
             if (!result) {
-                await this.commitTransaction();
                 return [];
             }
             const messageIds = result.map((row: any) => row.message_id);
             await this.updateMessagesAsReadByMessageIds(messageIds);
-            await this.commitTransaction();
             return result.map(mapToMessage);
         } catch (error) {
-            await this.rollbackTransaction();
             console.error("Error getting messages by connection ID:", error);
             throw error;
         }
