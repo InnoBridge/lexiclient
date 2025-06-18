@@ -83,6 +83,12 @@ const DELETE_CHAT_BY_CONNECTION_ID_QUERY =
 const DELETE_ALL_CHATS_QUERY =
     `DELETE FROM chats`;
 
+const GET_UNREAD_MESSAGES_COUNT_BY_CONNECTION_ID_QUERY = 
+    `SELECT COUNT(*) as unread_count 
+     FROM messages m
+     JOIN chats c ON m.chat_id = c.chat_id
+     WHERE c.connection_id = ? AND m.is_read = 0`;
+
 const GET_MESSAGES_BY_CHAT_ID_QUERY = (createdAfter?: number, limit?: number, offset?: number, desc: boolean = true) => {
     const createdAfterCondition = createdAfter ? 'AND created_at > ?' : '';
     const limitClause = limit ? `LIMIT ${limit}` : '';
@@ -124,6 +130,12 @@ const GET_MESSAGES_BY_CONNECTION_ID_QUERY = (createdAfter?: number, limit?: numb
             ${limitClause} ${offsetClause}`;
 };
 
+const UPDATE_MESSAGES_AS_READ_BY_MESSAGE_IDS_QUERY = (messageCount: number): string => {
+    const placeholders = Array(messageCount).fill('?').join(', ');
+    return `UPDATE messages SET is_read = 1 
+            WHERE message_id IN (${placeholders})`;
+};
+
 const UPSERT_MESSAGES_QUERY = (messageCount: number): string => {
     const placeholders = Array(messageCount).fill('(?, ?, ?, ?, ?, ?)').join(', ');
     return `INSERT INTO messages (message_id, chat_id, sender_id, content, is_read, created_at)
@@ -150,8 +162,10 @@ export {
     DELETE_CHAT_QUERY,
     DELETE_CHAT_BY_CONNECTION_ID_QUERY,
     DELETE_ALL_CHATS_QUERY,
+    GET_UNREAD_MESSAGES_COUNT_BY_CONNECTION_ID_QUERY,
     GET_MESSAGES_BY_CHAT_ID_QUERY,
     GET_MESSAGES_BY_USER_ID_QUERY,
     GET_MESSAGES_BY_CONNECTION_ID_QUERY,
+    UPDATE_MESSAGES_AS_READ_BY_MESSAGE_IDS_QUERY,
     UPSERT_MESSAGES_QUERY
 };
