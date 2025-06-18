@@ -50,6 +50,13 @@ const deleteAllChats = async (): Promise<void> => {
     return await cacheClient.deleteAllChats();
 };
 
+const getUnreadMessagesCountByConnectionId = async (connectionId: number): Promise<number> => {
+    if (!cacheClient) {
+        throw new Error("Cache client not initialized. Call initializeCache first.");
+    }
+    return await cacheClient.getUnreadMessagesCountByConnectionId(connectionId);
+};
+
 const getMessagesByChatId = async (chatId: string, createdAfter?: number, limit?: number, offset?: number, desc: boolean = true): Promise<Message[]> => {
     if (!cacheClient) {
         throw new Error("Cache client not initialized. Call initializeCache first.");
@@ -86,6 +93,7 @@ export {
     deleteChat,
     deleteChatByConnectionId,
     deleteAllChats,
+    getUnreadMessagesCountByConnectionId,
     getMessagesByChatId,
     getMessagesByUserId,
     getMessagesByConnectionId,

@@ -19,9 +19,11 @@ import {
     DELETE_CHAT_QUERY,
     DELETE_CHAT_BY_CONNECTION_ID_QUERY,
     DELETE_ALL_CHATS_QUERY,
+    GET_UNREAD_MESSAGES_COUNT_BY_CONNECTION_ID_QUERY,
     GET_MESSAGES_BY_CHAT_ID_QUERY,
     GET_MESSAGES_BY_USER_ID_QUERY,
     GET_MESSAGES_BY_CONNECTION_ID_QUERY,
+    UPDATE_MESSAGES_AS_READ_BY_MESSAGE_IDS_QUERY,
     UPSERT_MESSAGES_QUERY
 } from "@/storage/queries";
 
@@ -126,10 +128,29 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
         }
     }
 
+    async getUnreadMessagesCountByConnectionId(connectionId: number): Promise<number> {
+        const result = await this.getFirstAsync(GET_UNREAD_MESSAGES_COUNT_BY_CONNECTION_ID_QUERY, [connectionId]);
+        return result ? (result as { unread_count: number }).unread_count : 0;
+    };
+
     async getMessagesByChatId(chatId: string, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
-        const query = GET_MESSAGES_BY_CHAT_ID_QUERY(createdAfter, limit, offset, desc);
-        const result = await this.getAllAsync(query, [chatId]);
-        return result.map(mapToMessage);
+        try {
+            await this.beginTransaction();
+            const query = GET_MESSAGES_BY_CHAT_ID_QUERY(createdAfter, limit, offset, desc);
+            const result = await this.getAllAsync(query, [chatId]);
+            if (!result) {
+                await this.commitTransaction();
+                return [];
+            }
+            const messageIds = result.map((row: any) => row.message_id);
+            this.updateMessagesAsReadByMessageIds(messageIds);
+            await this.commitTransaction();
+            return result.map(mapToMessage);
+        } catch (error) {
+            await this.rollbackTransaction();
+            console.error("Error getting messages by chat ID:", error);
+            throw error;
+        }
     }
 
     async getMessagesByUserId(userId: string, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
@@ -139,9 +160,23 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
     }
 
     async getMessagesByConnectionId(connectionId: number, createdAfter?: number, limit?: number, offset?: number, desc?: boolean): Promise<Message[]> {
-        const query = GET_MESSAGES_BY_CONNECTION_ID_QUERY(createdAfter, limit, offset, desc);
-        const result = await this.getAllAsync(query, [connectionId]);
-        return result.map(mapToMessage);
+        try {
+            await this.beginTransaction();
+            const query = GET_MESSAGES_BY_CONNECTION_ID_QUERY(createdAfter, limit, offset, desc);
+            const result = await this.getAllAsync(query, [connectionId]);
+            if (!result) {
+                await this.commitTransaction();
+                return [];
+            }
+            const messageIds = result.map((row: any) => row.message_id);
+            this.updateMessagesAsReadByMessageIds(messageIds);
+            await this.commitTransaction();
+            return result.map(mapToMessage);
+        } catch (error) {
+            await this.rollbackTransaction();
+            console.error("Error getting messages by connection ID:", error);
+            throw error;
+        }
     }
 
     async upsertMessages(messages: Message[]): Promise<void> {
@@ -161,6 +196,19 @@ class SqlliteChatsClient extends SqlliteBaseClient implements CachedChatsClient 
             await this.runAsync(query, params);
         } catch (error) {
             console.error("Error upserting messages:", error);
+            throw error;
+        }
+    }
+
+    private async updateMessagesAsReadByMessageIds(messageIds: string[]): Promise<void> {
+        if (!messageIds || messageIds.length === 0) {
+            return;
+        }
+        try {
+            const query = UPDATE_MESSAGES_AS_READ_BY_MESSAGE_IDS_QUERY(messageIds.length);
+            await this.runAsync(query, messageIds);
+        } catch (error) {
+            console.error("Error updating messages as read:", error);
             throw error;
         }
     }
